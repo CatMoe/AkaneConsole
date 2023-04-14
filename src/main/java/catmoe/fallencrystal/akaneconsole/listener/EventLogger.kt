@@ -38,6 +38,7 @@ class EventLogger : Listener{
         val ipAddress = socketToAddress(event.connection.socketAddress)
         if (ipAddress.contains("/127.0.0.1")) return
         if (event.connection.version.toString() == "-1") return
+        if (event.connection.version.toString() == "0") return
         MessageUtil.logInfo("[Ping] $ipAddress Ping了一下服务器. (版本 $version)")
     }
 
@@ -66,19 +67,23 @@ class EventLogger : Listener{
 
     @EventHandler (priority = 127)
     fun serverKick(event: ServerKickEvent) {
-        val player = event.player.name
-        val displayName = getDisplayName(player)
-        val from = event.kickedFrom.name
-        val reason = event.kickReasonComponent
-        MessageUtil.logInfo("[Server] $displayName 因 \"$reason\" 从 $from 服务器断开连接.")
+        try {
+            val player = event.player.name
+            val displayName = getDisplayName(player)
+            val from = event.kickedFrom.name
+            val reason = event.kickReasonComponent
+            MessageUtil.logInfo("[Server] $displayName 因 \"$reason\" 从 $from 服务器断开连接.")
+        } catch (_: NullPointerException) {}
     }
 
     @EventHandler (priority = 127)
     fun serverDisconnect(event: ServerDisconnectEvent) {
-        val player = event.player
-        val target = event.target.name
-        val displayName = getDisplayName(player.name)
-        MessageUtil.logInfo("[Server] $displayName 主动与服务器 $target 断开了连接.")
+        try {
+            val player = event.player
+            val target = event.target.name
+            val displayName = getDisplayName(player.name)
+            MessageUtil.logInfo("[Server] $displayName 主动与服务器 $target 断开了连接.")
+        } catch (_: NullPointerException) {}
     }
 
     @EventHandler (priority = 127)
