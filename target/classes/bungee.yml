@@ -1,5 +1,7 @@
 name: AkaneConsole
-version: '1.0-SNAPSHOT'
+version: '1.0'
 main: catmoe.fallencrystal.akaneconsole.AkaneConsole
+description: ❤ by CatMoe
+author: CatMoe
 depends:
   - LuckPerms

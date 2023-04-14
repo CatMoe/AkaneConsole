@@ -14,7 +14,8 @@ class OriginalFilter : Filter {
         "{0} executed command: /{1}",
         "Error occurred processing connection for",
         "Error authenticating",
-        "has been reloaded. This is NOT advisable and you will not be supported with any issues that arise! Please restart"
+        "has been reloaded. This is NOT advisable and you will not be supported with any issues that arise! Please restart",
+        "Plugin listener catmoe.fallencrystal."
     )
 
     override fun isLoggable(record: LogRecord?): Boolean { if (record != null) { return !needFilter(record.message) }; return true }
