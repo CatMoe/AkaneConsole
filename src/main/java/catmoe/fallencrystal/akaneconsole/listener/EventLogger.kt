@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package catmoe.fallencrystal.akaneconsole.listener
 
 import catmoe.fallencrystal.akaneconsole.util.MessageUtil
@@ -73,7 +75,7 @@ class EventLogger : Listener{
             val player = event.player.name
             val displayName = getDisplayName(player)
             val from = event.kickedFrom.name
-            val reason = event.kickReasonComponent
+            val reason = event.kickReason
             MessageUtil.logInfo("[Server] $displayName 因 \"$reason\" 从 $from 服务器断开连接.")
         } catch (_: NullPointerException) {}
     }
