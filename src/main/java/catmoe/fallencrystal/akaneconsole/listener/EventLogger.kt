@@ -19,8 +19,10 @@ class EventLogger : Listener{
         val player = ProxyServer.getInstance().getPlayer(playerName)
         val name = player.name
         val luckpermsUser = LuckPermsProvider.get().userManager.getUser(player.uniqueId)
-        val prefix = luckpermsUser?.cachedData?.metaData?.prefix
-        val suffix = luckpermsUser?.cachedData?.metaData?.suffix
+        val luckpermsPrefix = luckpermsUser?.cachedData?.metaData?.prefix
+        val luckpermsSuffix = luckpermsUser?.cachedData?.metaData?.suffix
+        val prefix = if (luckpermsPrefix.isNullOrEmpty()) {""} else {luckpermsPrefix}
+        val suffix = if (luckpermsSuffix.isNullOrEmpty()) {""} else {luckpermsSuffix}
         return prefix + name + suffix
     }
     @EventHandler (priority = -127)
