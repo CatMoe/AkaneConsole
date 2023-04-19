@@ -21,11 +21,10 @@ class OriginalFilter : Filter {
     override fun isLoggable(record: LogRecord?): Boolean { if (record != null) { return !needFilter(record.message) }; return true }
 
     private fun needFilter(record: String): Boolean {
-        var match = false
         if (record.contains(MessageUtil.prefix())) return false
         exceptionCatcher(record)
-        for (filtered in original) {if(record.contains(filtered)) match = true}
-        return match
+        for (filtered in original) {if(record.contains(filtered)) return true}
+        return false
     }
 
     private fun exceptionCatcher(log: String) {

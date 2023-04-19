@@ -10,12 +10,15 @@ import net.md_5.bungee.api.connection.ProxiedPlayer
 import net.md_5.bungee.api.event.*
 
 import net.md_5.bungee.api.plugin.Listener
+import net.md_5.bungee.api.plugin.Plugin
 import net.md_5.bungee.event.EventHandler
 import java.net.SocketAddress
 
-class EventLogger : Listener{
+class EventLogger(private val plugin: Plugin) : Listener{
 
     private fun socketToAddress(address: SocketAddress): String { return address.toString().replaceFirst("/(.*)[:]\\d+/", "$1") }
+
+    private val proxy: ProxyServer = ProxyServer.getInstance()
 
     private fun getDisplayName(playerName: String): String {
         val player = ProxyServer.getInstance().getPlayer(playerName)
@@ -29,80 +32,96 @@ class EventLogger : Listener{
     }
     @EventHandler (priority = -127)
     fun preLogin(event: PostLoginEvent) {
-        val player = event.player
-        val version = Version.getVersion(player.pendingConnection.version)
-        val from = player.pendingConnection.virtualHost.hostString
-        val ipAddress = socketToAddress(player.socketAddress)
-        val displayName = getDisplayName(player.name)
-        MessageUtil.logInfo("[PostLogin] [$ipAddress] $displayName 从 $from 登录到了服务器. (版本 $version)")
+        proxy.scheduler.runAsync(plugin) {
+            val player = event.player
+            val version = Version.getVersion(player.pendingConnection.version)
+            val from = player.pendingConnection.virtualHost.hostString
+            val ipAddress = socketToAddress(player.socketAddress)
+            val displayName = getDisplayName(player.name)
+            MessageUtil.logInfo("[PostLogin] [$ipAddress] $displayName 从 $from 登录到了服务器. (版本 $version)")
+        }
     }
     @EventHandler (priority = 127)
     fun ping(event: ProxyPingEvent) {
-        val version = Version.getVersion(event.connection.version)
-        val ipAddress = socketToAddress(event.connection.socketAddress)
-        if (ipAddress.contains("/127.0.0.1")) return
-        if (event.connection.version.toString() == "-1") return
-        if (event.connection.version.toString() == "0") return
-        MessageUtil.logInfo("[Ping] $ipAddress Ping了一下服务器. (版本 $version)")
+        proxy.scheduler.runAsync(plugin) {
+            val version = Version.getVersion(event.connection.version)
+            val ipAddress = socketToAddress(event.connection.socketAddress)
+            if (ipAddress.contains("/127.0.0.1")) return@runAsync
+            if (event.connection.version.toString() == "-1") return@runAsync
+            if (event.connection.version.toString() == "0") return@runAsync
+            MessageUtil.logInfo("[Ping] $ipAddress Ping了一下服务器. (版本 $version)")
+        }
     }
 
     @EventHandler (priority =  120)
     fun chat(event: ChatEvent) {
-        val chat = event.message
-        val isCommand = event.isCommand
-        val isProxyCommand = event.isProxyCommand
-        val player = event.sender.toString()
-        val displayName = getDisplayName(player)
-        val server = ProxyServer.getInstance().getPlayer(player).server.info.name
-        if (!isCommand && !isProxyCommand) { MessageUtil.logInfo("[Chat] [$server] $displayName : $chat") }
-        if (isProxyCommand) {MessageUtil.logInfo("[ProxyCommand] [$server] $displayName : $chat"); return}
-        if (isCommand) {MessageUtil.logInfo("[Command] [$server] $displayName : $chat")}
+        proxy.scheduler.runAsync(plugin) {
+            val chat = event.message
+            val isCommand = event.isCommand
+            val isProxyCommand = event.isProxyCommand
+            val player = event.sender.toString()
+            val displayName = getDisplayName(player)
+            val server = ProxyServer.getInstance().getPlayer(player).server.info.name
+            if (!isCommand && !isProxyCommand) { MessageUtil.logInfo("[Chat] [$server] $displayName : $chat") }
+            if (isProxyCommand) {MessageUtil.logInfo("[ProxyCommand] [$server] $displayName : $chat"); return@runAsync}
+            if (isCommand) {MessageUtil.logInfo("[Command] [$server] $displayName : $chat")}
+        }
     }
 
     @EventHandler
     fun switchServer(event: ServerSwitchEvent) {
-        if (event.from == null) return
-        val from = event.from.name
-        val target = event.player.server.info.name
-        val player = event.player.name
-        val displayName = getDisplayName(player)
-        MessageUtil.logInfo("[Server] $displayName $from -> $target")
+        proxy.scheduler.runAsync(plugin) {
+            if (event.from == null) return@runAsync // 当玩家是直接连接到此服务器的时候
+            val from = event.from.name
+            val target = event.player.server.info.name
+            val player = event.player.name
+            val displayName = getDisplayName(player)
+            MessageUtil.logInfo("[Server] $displayName $from -> $target")
+        }
     }
 
     @EventHandler (priority = 127)
     fun serverKick(event: ServerKickEvent) {
-        try {
-            val player = event.player.name
-            val displayName = getDisplayName(player)
-            val from = event.kickedFrom.name
-            val reason = event.kickReason
-            MessageUtil.logInfo("[Server] $displayName 因 \"$reason\" 从 $from 服务器断开连接.")
-        } catch (_: NullPointerException) {}
+        proxy.scheduler.runAsync(plugin) {
+            try {
+                val player = event.player.name
+                val displayName = getDisplayName(player)
+                val from = event.kickedFrom.name
+                val reason = event.kickReason
+                MessageUtil.logInfo("[Server] $displayName 因 \"$reason\" 从 $from 服务器断开连接.")
+            } catch (_: NullPointerException) {}
+        }
     }
 
     @EventHandler (priority = 127)
     fun serverDisconnect(event: ServerDisconnectEvent) {
-        try {
-            val player = event.player
-            val target = event.target.name
-            val displayName = getDisplayName(player.name)
-            MessageUtil.logInfo("[Server] $displayName 主动与服务器 $target 断开了连接.")
-        } catch (_: NullPointerException) {}
+        proxy.scheduler.runAsync(plugin) {
+            try {
+                val player = event.player
+                val target = event.target.name
+                val displayName = getDisplayName(player.name)
+                MessageUtil.logInfo("[Server] $displayName 主动与服务器 $target 断开了连接.")
+            } catch (_: NullPointerException) {}
+        }
     }
 
     @EventHandler (priority = 127)
     fun serverConnected(event: ServerConnectedEvent) {
-        val player = event.player
-        val target = event.server.info.name
-        val displayName = getDisplayName(player.name)
-        MessageUtil.logInfo("[Server] $displayName 已与服务器 $target 建立连接.")
+        proxy.scheduler.runAsync(plugin) {
+            val player = event.player
+            val target = event.server.info.name
+            val displayName = getDisplayName(player.name)
+            MessageUtil.logInfo("[Server] $displayName 已与服务器 $target 建立连接.")
+        }
     }
 
     @EventHandler (priority = 127)
     fun playerDisconnect(event: PlayerDisconnectEvent) {
-        val player = event.player
-        val displayName = getDisplayName(player.name)
-        MessageUtil.logInfo("[Server] $displayName 已与BungeeCord断开连接.")
+        proxy.scheduler.runAsync(plugin) {
+            val player = event.player
+            val displayName = getDisplayName(player.name)
+            MessageUtil.logInfo("[Server] $displayName 已与BungeeCord断开连接.")
+        }
     }
 
     @EventHandler
