@@ -21,14 +21,18 @@ class EventLogger(private val plugin: Plugin) : Listener{
     private val proxy: ProxyServer = ProxyServer.getInstance()
 
     private fun getDisplayName(playerName: String): String {
-        val player = ProxyServer.getInstance().getPlayer(playerName)
-        val name = player.name
-        val luckpermsUser = LuckPermsProvider.get().userManager.getUser(player.uniqueId)
-        val luckpermsPrefix = luckpermsUser?.cachedData?.metaData?.prefix
-        val luckpermsSuffix = luckpermsUser?.cachedData?.metaData?.suffix
-        val prefix = if (luckpermsPrefix.isNullOrEmpty()) {""} else {luckpermsPrefix}
-        val suffix = if (luckpermsSuffix.isNullOrEmpty()) {""} else {luckpermsSuffix}
-        return prefix + name + suffix
+        return try {
+            val player = ProxyServer.getInstance().getPlayer(playerName)
+            val name = player.name
+            val luckpermsUser = LuckPermsProvider.get().userManager.getUser(player.uniqueId)
+            val luckpermsPrefix = luckpermsUser?.cachedData?.metaData?.prefix
+            val luckpermsSuffix = luckpermsUser?.cachedData?.metaData?.suffix
+            val prefix = if (luckpermsPrefix.isNullOrEmpty()) {""} else {luckpermsPrefix}
+            val suffix = if (luckpermsSuffix.isNullOrEmpty()) {""} else {luckpermsSuffix}
+            prefix + name + suffix
+        } catch (e: NullPointerException) {
+            playerName
+        }
     }
     @EventHandler (priority = -127)
     fun preLogin(event: PostLoginEvent) {
@@ -41,7 +45,7 @@ class EventLogger(private val plugin: Plugin) : Listener{
             MessageUtil.logInfo("[PostLogin] [$ipAddress] $displayName 从 $from 登录到了服务器. (版本 $version)")
         }
     }
-    @EventHandler (priority = 127)
+    @EventHandler (priority = -127)
     fun ping(event: ProxyPingEvent) {
         proxy.scheduler.runAsync(plugin) {
             val version = Version.getVersion(event.connection.version)
@@ -80,7 +84,7 @@ class EventLogger(private val plugin: Plugin) : Listener{
         }
     }
 
-    @EventHandler (priority = 127)
+    @EventHandler (priority = -127)
     fun serverKick(event: ServerKickEvent) {
         proxy.scheduler.runAsync(plugin) {
             try {
@@ -93,7 +97,7 @@ class EventLogger(private val plugin: Plugin) : Listener{
         }
     }
 
-    @EventHandler (priority = 127)
+    @EventHandler (priority = -127)
     fun serverDisconnect(event: ServerDisconnectEvent) {
         proxy.scheduler.runAsync(plugin) {
             try {
@@ -105,7 +109,7 @@ class EventLogger(private val plugin: Plugin) : Listener{
         }
     }
 
-    @EventHandler (priority = 127)
+    @EventHandler (priority = -127)
     fun serverConnected(event: ServerConnectedEvent) {
         proxy.scheduler.runAsync(plugin) {
             val player = event.player
@@ -117,11 +121,12 @@ class EventLogger(private val plugin: Plugin) : Listener{
 
     @EventHandler (priority = 127)
     fun playerDisconnect(event: PlayerDisconnectEvent) {
-        proxy.scheduler.runAsync(plugin) {
+        // 此方法不可异步 否则抛出NullPointerException (玩家都要断开连接了你异步个啥啊)
+        try {
             val player = event.player
             val displayName = getDisplayName(player.name)
             MessageUtil.logInfo("[Server] $displayName 已与BungeeCord断开连接.")
-        }
+        } catch (_: NullPointerException) { }
     }
 
     @EventHandler
