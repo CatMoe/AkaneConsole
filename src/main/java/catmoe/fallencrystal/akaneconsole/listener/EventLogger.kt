@@ -4,6 +4,7 @@ package catmoe.fallencrystal.akaneconsole.listener
 
 import catmoe.fallencrystal.akaneconsole.util.MessageUtil
 import catmoe.fallencrystal.akaneconsole.util.Version
+import com.github.benmanes.caffeine.cache.Caffeine
 import net.luckperms.api.LuckPermsProvider
 import net.md_5.bungee.api.ProxyServer
 import net.md_5.bungee.api.connection.ProxiedPlayer
@@ -13,6 +14,7 @@ import net.md_5.bungee.api.plugin.Listener
 import net.md_5.bungee.api.plugin.Plugin
 import net.md_5.bungee.event.EventHandler
 import java.net.SocketAddress
+import java.util.concurrent.TimeUnit
 
 class EventLogger(private val plugin: Plugin) : Listener{
 
@@ -20,7 +22,12 @@ class EventLogger(private val plugin: Plugin) : Listener{
 
     private val proxy: ProxyServer = ProxyServer.getInstance()
 
+    // Cache for displayName
+    private val nameCache = Caffeine.newBuilder().expireAfterWrite(10, TimeUnit.SECONDS).weakKeys().build<String, String>()
+
     private fun getDisplayName(playerName: String): String {
+        val cachedName = nameCache.getIfPresent(playerName)
+        if (cachedName != null) {return cachedName}
         return try {
             val player = ProxyServer.getInstance().getPlayer(playerName)
             val name = player.name
@@ -29,11 +36,14 @@ class EventLogger(private val plugin: Plugin) : Listener{
             val luckpermsSuffix = luckpermsUser?.cachedData?.metaData?.suffix
             val prefix = if (luckpermsPrefix.isNullOrEmpty()) {""} else {luckpermsPrefix}
             val suffix = if (luckpermsSuffix.isNullOrEmpty()) {""} else {luckpermsSuffix}
-            prefix + name + suffix
+            val displayName = prefix + name + suffix
+            nameCache.put(playerName, displayName)
+            displayName
         } catch (e: NullPointerException) {
             playerName
         }
     }
+
     @EventHandler (priority = -127)
     fun preLogin(event: PostLoginEvent) {
         proxy.scheduler.runAsync(plugin) {
@@ -92,7 +102,7 @@ class EventLogger(private val plugin: Plugin) : Listener{
                 val displayName = getDisplayName(player)
                 val from = event.kickedFrom.name
                 val reason = event.kickReason
-                MessageUtil.logInfo("[Server] $displayName 因 \"$reason\" 从 $from 服务器断开连接.")
+                MessageUtil.logInfo("[Server] $displayName 因 \"$reason&r\" 从 $from 服务器断开连接.")
             } catch (_: NullPointerException) {}
         }
     }
@@ -141,3 +151,4 @@ class EventLogger(private val plugin: Plugin) : Listener{
         ProxyServer.getInstance().stop()
     }
 }
+
