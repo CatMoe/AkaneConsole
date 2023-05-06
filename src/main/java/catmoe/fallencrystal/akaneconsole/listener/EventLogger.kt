@@ -2,6 +2,7 @@
 
 package catmoe.fallencrystal.akaneconsole.listener
 
+import catmoe.fallencrystal.akaneconsole.util.ConsoleLogger
 import catmoe.fallencrystal.akaneconsole.util.MessageUtil
 import catmoe.fallencrystal.akaneconsole.util.Version
 import com.github.benmanes.caffeine.cache.Caffeine
@@ -19,6 +20,19 @@ import java.util.concurrent.TimeUnit
 class EventLogger(private val plugin: Plugin) : Listener{
 
     private fun socketToAddress(address: SocketAddress): String { return address.toString().replaceFirst("/(.*)[:]\\d+/", "$1") }
+
+    private val dontLoggerCommand: List<String> = listOf(
+        "/login",
+        "/l",
+        "/reg",
+        "/register",
+        "/unregister",
+        "/premium",
+        "/cracked",
+        "/createpassword",
+        "/changepassword",
+        "/startsession"
+    )
 
     private val proxy: ProxyServer = ProxyServer.getInstance()
 
@@ -52,18 +66,23 @@ class EventLogger(private val plugin: Plugin) : Listener{
             val from = player.pendingConnection.virtualHost.hostString
             val ipAddress = socketToAddress(player.socketAddress)
             val displayName = getDisplayName(player.name)
-            MessageUtil.logInfo("[PostLogin] [$ipAddress] $displayName 从 $from 登录到了服务器. (版本 $version)")
+            ConsoleLogger.logger(1, "[PostLogin] [$ipAddress] $displayName 从 $from 登录到了服务器. (版本 $version)")
         }
     }
     @EventHandler (priority = -127)
     fun ping(event: ProxyPingEvent) {
         proxy.scheduler.runAsync(plugin) {
-            val version = Version.getVersion(event.connection.version)
+            val version = event.connection.version
+            val versionConverted = Version.getVersion(version)
             val ipAddress = socketToAddress(event.connection.socketAddress)
+            // 不记录本地Ping 避免出现本地测试Ping垃圾邮件或其它东西. 未知的版本也是一样
             if (ipAddress.contains("/127.0.0.1")) return@runAsync
-            if (event.connection.version.toString() == "-1") return@runAsync
-            if (event.connection.version.toString() == "0") return@runAsync
-            MessageUtil.logInfo("[Ping] $ipAddress Ping了一下服务器. (版本 $version)")
+            /*
+            某些MCP Ping的协议通常为0或-1 我们不记录此类Ping 虽然它也很可能是某些攻击造成的
+            当然 如果状态为null包 (NullPing Crasher) 应该会直接抛出Exception ——没什么可做的 安装一个好的反机器人.
+             */
+            if (version == 0 || version == -1) return@runAsync
+            ConsoleLogger.logger(1, "[Ping] $ipAddress Ping了一下服务器. (版本 $versionConverted)")
         }
     }
 
@@ -75,10 +94,12 @@ class EventLogger(private val plugin: Plugin) : Listener{
             val isProxyCommand = event.isProxyCommand
             val player = event.sender.toString()
             val displayName = getDisplayName(player)
-            val server = ProxyServer.getInstance().getPlayer(player).server.info.name
-            if (!isCommand && !isProxyCommand) { MessageUtil.logInfo("[Chat] [$server] $displayName : $chat") }
-            if (isProxyCommand) {MessageUtil.logInfo("[ProxyCommand] [$server] $displayName : $chat"); return@runAsync}
-            if (isCommand) {MessageUtil.logInfo("[Command] [$server] $displayName : $chat")}
+            val server = proxy.getPlayer(player).server.info.name
+            // 不要记录敏感命令
+            for (command in dontLoggerCommand) { if (isCommand and chat.contains(command)) return@runAsync }
+            if (!isCommand && !isProxyCommand) { ConsoleLogger.logger(1, "[Chat] [$server] $displayName : $chat") }
+            if (isProxyCommand) {ConsoleLogger.logger(1, "[ProxyCommand] [$server] $displayName : $chat"); return@runAsync}
+            if (isCommand) {ConsoleLogger.logger(1, "[Command] [$server] $displayName : $chat")}
         }
     }
 
@@ -90,7 +111,7 @@ class EventLogger(private val plugin: Plugin) : Listener{
             val target = event.player.server.info.name
             val player = event.player.name
             val displayName = getDisplayName(player)
-            MessageUtil.logInfo("[Server] $displayName $from -> $target")
+            ConsoleLogger.logger(1, "[Server] $displayName $from -> $target")
         }
     }
 
@@ -102,7 +123,7 @@ class EventLogger(private val plugin: Plugin) : Listener{
                 val displayName = getDisplayName(player)
                 val from = event.kickedFrom.name
                 val reason = event.kickReason
-                MessageUtil.logInfo("[Server] $displayName 因 \"$reason&r\" 从 $from 服务器断开连接.")
+                ConsoleLogger.logger(1, "[Server] $displayName 因 \"$reason&r\" 从 $from 服务器断开连接.")
             } catch (_: NullPointerException) {}
         }
     }
@@ -114,7 +135,7 @@ class EventLogger(private val plugin: Plugin) : Listener{
                 val player = event.player
                 val target = event.target.name
                 val displayName = getDisplayName(player.name)
-                MessageUtil.logInfo("[Server] $displayName 主动与服务器 $target 断开了连接.")
+                ConsoleLogger.logger(1, "[Server] $displayName 主动与服务器 $target 断开了连接.")
             } catch (_: NullPointerException) {}
         }
     }
@@ -125,7 +146,7 @@ class EventLogger(private val plugin: Plugin) : Listener{
             val player = event.player
             val target = event.server.info.name
             val displayName = getDisplayName(player.name)
-            MessageUtil.logInfo("[Server] $displayName 已与服务器 $target 建立连接.")
+            ConsoleLogger.logger(1, "[Server] $displayName 已与服务器 $target 建立连接.")
         }
     }
 
@@ -135,7 +156,7 @@ class EventLogger(private val plugin: Plugin) : Listener{
         try {
             val player = event.player
             val displayName = getDisplayName(player.name)
-            MessageUtil.logInfo("[Server] $displayName 已与BungeeCord断开连接.")
+            ConsoleLogger.logger(1, "[Server] $displayName 已与BungeeCord断开连接.")
         } catch (_: NullPointerException) { }
     }
 
