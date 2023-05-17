@@ -3,15 +3,17 @@ package catmoe.fallencrystal.akaneconsole
 import catmoe.fallencrystal.akaneconsole.listener.EventLogger
 import catmoe.fallencrystal.akaneconsole.util.OriginalFilter
 import catmoe.fallencrystal.akaneconsole.util.MessageUtil
+import catmoe.fallencrystal.moefilter.api.logger.LoggerManager
 import net.md_5.bungee.api.ProxyServer
 import net.md_5.bungee.api.plugin.Plugin
 
 class AkaneConsole : Plugin() {
 
     override fun onEnable() {
-        ProxyServer.getInstance().logger.filter = OriginalFilter()
         ProxyServer.getInstance().pluginManager.registerListener(this, EventLogger(this))
         MessageUtil.logInfo("已成功载入")
+        LoggerManager.registerFilter(OriginalFilter())
+        MessageUtil.logInfo("已成功与MoeFilter挂钩并注册控制台过滤器.")
     }
 
     override fun onDisable() {

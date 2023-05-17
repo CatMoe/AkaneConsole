@@ -1,9 +1,9 @@
 package catmoe.fallencrystal.akaneconsole.util
 
-import java.util.logging.Filter
+import catmoe.fallencrystal.moefilter.api.logger.ILogger
 import java.util.logging.LogRecord
 
-class OriginalFilter : Filter {
+class OriginalFilter : ILogger {
 
     private val original: List<String> = listOf(
         "{0} has connected",
