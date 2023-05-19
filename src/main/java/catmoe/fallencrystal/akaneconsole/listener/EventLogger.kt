@@ -4,8 +4,8 @@ package catmoe.fallencrystal.akaneconsole.listener
 
 import catmoe.fallencrystal.akaneconsole.displayname.DisplayName
 import catmoe.fallencrystal.akaneconsole.util.ConsoleLogger
-import catmoe.fallencrystal.akaneconsole.util.MessageUtil
 import catmoe.fallencrystal.akaneconsole.util.Version
+import catmoe.fallencrystal.moefilter.util.MessageUtil
 import net.md_5.bungee.api.ProxyServer
 import net.md_5.bungee.api.connection.ProxiedPlayer
 import net.md_5.bungee.api.event.*

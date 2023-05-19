@@ -1,5 +1,6 @@
 package catmoe.fallencrystal.akaneconsole.util
 
+import catmoe.fallencrystal.moefilter.util.MessageUtil
 import com.github.benmanes.caffeine.cache.Caffeine
 import java.util.concurrent.TimeUnit
 
@@ -9,12 +10,12 @@ object ConsoleLogger {
     private const val expireTime = 5
     private val messageCache = Caffeine.newBuilder().expireAfterWrite(expireTime.toLong(), TimeUnit.SECONDS).build<String, CacheEntry>()
 
-    fun writeMessage(message: String) {
+    private fun writeMessage(message: String) {
         val entry = messageCache.getIfPresent(message)
         if (entry != null) { entry.count++ } else { messageCache.put(message, CacheEntry(message)) }
     }
 
-    fun getMessageCount(message: String): Int {
+    private fun getMessageCount(message: String): Int {
         val entry = messageCache.getIfPresent(message)
         return entry?.count ?:0
     }
