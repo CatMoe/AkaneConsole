@@ -1,6 +1,7 @@
 package catmoe.fallencrystal.akaneconsole.util
 
 import catmoe.fallencrystal.moefilter.api.logger.ILogger
+import catmoe.fallencrystal.moefilter.util.message.MessageUtil
 import java.util.logging.LogRecord
 
 class OriginalFilter : ILogger {
@@ -21,7 +22,7 @@ class OriginalFilter : ILogger {
     override fun isLoggable(record: LogRecord?): Boolean { if (record != null) { return !needFilter(record.message) }; return true }
 
     private fun needFilter(record: String): Boolean {
-        if (record.contains(MessageUtil.prefix())) return false
+        if (record.contains("[AkaneConsole]")) return false
         exceptionCatcher(record)
         for (filtered in original) {if(record.contains(filtered)) return true}
         return false
@@ -31,6 +32,6 @@ class OriginalFilter : ILogger {
         val unreachableMojangSessionServer1 = "Error authenticating"
         val unreachableMojangSessionServer2 = "with minecraft.net"
         if (log.contains(unreachableMojangSessionServer1) && log.contains(unreachableMojangSessionServer2))
-        {MessageUtil.logWarn("无法连接到认证服务器(sessionserver.mojang.com).")}
+        {MessageUtil.logWarn("[AkaneConsole] 无法连接到认证服务器(sessionserver.mojang.com).")}
     }
 }

@@ -34,6 +34,8 @@ class EventLogger(private val plugin: Plugin) : Listener{
 
     private val proxy: ProxyServer = ProxyServer.getInstance()
 
+    private val prefix = "[AkaneConsole]"
+
     private fun getDisplayName(uuid: UUID): String {
         val player = ProxyServer.getInstance().getPlayer(uuid).displayName
         val display = DisplayCache.getDisplay(uuid)
@@ -48,7 +50,7 @@ class EventLogger(private val plugin: Plugin) : Listener{
             val from = player.pendingConnection.virtualHost.hostString
             val ipAddress = socketToAddress(player.socketAddress)
             val displayName = getDisplayName(player.uniqueId)
-            ConsoleLogger.logger(1, "[PostLogin] [$ipAddress] $displayName 从 $from 登录到了服务器. (版本 $version)")
+            ConsoleLogger.logger(1, "$prefix [PostLogin] [$ipAddress] $displayName 从 $from 登录到了服务器. (版本 $version)")
         }
     }
     @EventHandler (priority = -127)
@@ -64,7 +66,7 @@ class EventLogger(private val plugin: Plugin) : Listener{
             当然 如果状态为null包 (NullPing Crasher) 应该会直接抛出Exception ——没什么可做的 安装一个好的反机器人.
              */
             if (version == 0 || version == -1) return@runAsync
-            ConsoleLogger.logger(1, "[Ping] $ipAddress Ping了一下服务器. (版本 $versionConverted)")
+            ConsoleLogger.logger(1, "$prefix [Ping] $ipAddress Ping了一下服务器. (版本 $versionConverted)")
         }
     }
 
@@ -79,9 +81,9 @@ class EventLogger(private val plugin: Plugin) : Listener{
             val server = proxy.getPlayer(player).server.info.name
             // 不要记录敏感命令
             for (command in dontLoggerCommand) { if (isCommand and chat.contains(command)) return@runAsync }
-            if (!isCommand && !isProxyCommand) { ConsoleLogger.logger(1, "[Chat] [$server] $displayName : $chat") }
-            if (isProxyCommand) {ConsoleLogger.logger(1, "[ProxyCommand] [$server] $displayName : $chat"); return@runAsync}
-            if (isCommand) {ConsoleLogger.logger(1, "[Command] [$server] $displayName : $chat")}
+            if (!isCommand && !isProxyCommand) { ConsoleLogger.logger(1, "$prefix [Chat] [$server] $displayName : $chat") }
+            if (isProxyCommand) {ConsoleLogger.logger(1, "$prefix [ProxyCommand] [$server] $displayName : $chat"); return@runAsync}
+            if (isCommand) {ConsoleLogger.logger(1, "$prefix [Command] [$server] $displayName : $chat")}
         }
     }
 
@@ -93,7 +95,7 @@ class EventLogger(private val plugin: Plugin) : Listener{
             val target = event.player.server.info.name
             val player = event.player.name
             val displayName = getDisplayName(proxy.getPlayer(player).uniqueId)
-            ConsoleLogger.logger(1, "[Server] $displayName $from -> $target")
+            ConsoleLogger.logger(1, "$prefix [Server] $displayName $from -> $target")
         }
     }
 
@@ -105,7 +107,7 @@ class EventLogger(private val plugin: Plugin) : Listener{
                 val displayName = getDisplayName(event.player.uniqueId)
                 val from = event.kickedFrom.name
                 val reason = event.kickReason
-                ConsoleLogger.logger(1, "[Server] $displayName 因 \"$reason&r\" 从 $from 服务器断开连接.")
+                ConsoleLogger.logger(1, "$prefix [Server] $displayName 因 \"$reason&r\" 从 $from 服务器断开连接.")
             } catch (_: NullPointerException) {}
         }
     }
@@ -117,7 +119,7 @@ class EventLogger(private val plugin: Plugin) : Listener{
                 val player = event.player
                 val target = event.target.name
                 val displayName = getDisplayName(player.uniqueId)
-                ConsoleLogger.logger(1, "[Server] $displayName 主动与服务器 $target 断开了连接.")
+                ConsoleLogger.logger(1, "$prefix [Server] $displayName 主动与服务器 $target 断开了连接.")
             } catch (_: NullPointerException) {}
         }
     }
@@ -128,7 +130,7 @@ class EventLogger(private val plugin: Plugin) : Listener{
             val player = event.player
             val target = event.server.info.name
             val displayName = getDisplayName(player.uniqueId)
-            ConsoleLogger.logger(1, "[Server] $displayName 已与服务器 $target 建立连接.")
+            ConsoleLogger.logger(1, "$prefix [Server] $displayName 已与服务器 $target 建立连接.")
         }
     }
 
@@ -138,7 +140,7 @@ class EventLogger(private val plugin: Plugin) : Listener{
         try {
             val player = event.player
             val displayName = getDisplayName(player.uniqueId)
-            ConsoleLogger.logger(1, "[Server] $displayName 已与BungeeCord断开连接.")
+            ConsoleLogger.logger(1, "$prefix [Server] $displayName 已与BungeeCord断开连接.")
         } catch (_: NullPointerException) { }
     }
 
