@@ -2,7 +2,7 @@ package catmoe.fallencrystal.akaneconsole
 
 import catmoe.fallencrystal.akaneconsole.displayname.LuckPermsListener
 import catmoe.fallencrystal.akaneconsole.listener.EventLogger
-import catmoe.fallencrystal.akaneconsole.util.MessageUtil
+import catmoe.fallencrystal.moefilter.util.message.MessageUtil
 import catmoe.fallencrystal.akaneconsole.util.OriginalFilter
 import catmoe.fallencrystal.moefilter.api.logger.LoggerManager
 import net.luckperms.api.LuckPermsProvider
