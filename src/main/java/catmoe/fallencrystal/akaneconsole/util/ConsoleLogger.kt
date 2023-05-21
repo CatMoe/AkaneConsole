@@ -1,6 +1,6 @@
 package catmoe.fallencrystal.akaneconsole.util
 
-import catmoe.fallencrystal.moefilter.util.MessageUtil
+import catmoe.fallencrystal.moefilter.util.message.MessageUtil
 import com.github.benmanes.caffeine.cache.Caffeine
 import java.util.concurrent.TimeUnit
 
