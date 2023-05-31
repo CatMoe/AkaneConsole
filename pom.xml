@@ -98,7 +98,7 @@
     <dependency>
       <groupId>catmoe.fallencrystal</groupId>
       <artifactId>MoeFilter</artifactId>
-      <version>0.0.1-API2</version>
+      <version>0.0.1-API3</version>
       <scope>system</scope>
       <systemPath>${project.basedir}/lib/MoeFilter.jar</systemPath>
     </dependency>

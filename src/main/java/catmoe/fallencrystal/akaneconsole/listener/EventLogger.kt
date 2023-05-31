@@ -5,19 +5,18 @@ package catmoe.fallencrystal.akaneconsole.listener
 import catmoe.fallencrystal.akaneconsole.util.ConsoleLogger
 import catmoe.fallencrystal.akaneconsole.util.Version
 import catmoe.fallencrystal.moefilter.api.user.displaycache.DisplayCache
-import catmoe.fallencrystal.moefilter.util.message.MessageUtil
 import net.md_5.bungee.api.ProxyServer
-import net.md_5.bungee.api.connection.ProxiedPlayer
 import net.md_5.bungee.api.event.*
 import net.md_5.bungee.api.plugin.Listener
 import net.md_5.bungee.api.plugin.Plugin
 import net.md_5.bungee.event.EventHandler
+import java.net.InetSocketAddress
 import java.net.SocketAddress
 import java.util.*
 
 class EventLogger(private val plugin: Plugin) : Listener{
 
-    private fun socketToAddress(address: SocketAddress): String { return address.toString().replaceFirst("/(.*)[:]\\d+/", "$1") }
+    private fun socketToAddress(address: SocketAddress): String { return (address as InetSocketAddress).toString() }
 
     private val dontLoggerCommand: List<String> = listOf(
         "/login",
@@ -43,17 +42,6 @@ class EventLogger(private val plugin: Plugin) : Listener{
     }
 
     @EventHandler (priority = -127)
-    fun preLogin(event: PostLoginEvent) {
-        proxy.scheduler.runAsync(plugin) {
-            val player = event.player
-            val version = Version.getVersion(player.pendingConnection.version)
-            val from = player.pendingConnection.virtualHost.hostString
-            val ipAddress = socketToAddress(player.socketAddress)
-            val displayName = getDisplayName(player.uniqueId)
-            ConsoleLogger.logger(1, "$prefix [PostLogin] [$ipAddress] $displayName 从 $from 登录到了服务器. (版本 $version)")
-        }
-    }
-    @EventHandler (priority = -127)
     fun ping(event: ProxyPingEvent) {
         proxy.scheduler.runAsync(plugin) {
             val version = event.connection.version
@@ -67,35 +55,6 @@ class EventLogger(private val plugin: Plugin) : Listener{
              */
             if (version == 0 || version == -1) return@runAsync
             ConsoleLogger.logger(1, "$prefix [Ping] $ipAddress Ping了一下服务器. (版本 $versionConverted)")
-        }
-    }
-
-    @EventHandler (priority =  120)
-    fun chat(event: ChatEvent) {
-        proxy.scheduler.runAsync(plugin) {
-            val chat = event.message
-            val isCommand = event.isCommand
-            val isProxyCommand = event.isProxyCommand
-            val player = event.sender.toString()
-            val displayName = getDisplayName(proxy.getPlayer(player).uniqueId)
-            val server = proxy.getPlayer(player).server.info.name
-            // 不要记录敏感命令
-            for (command in dontLoggerCommand) { if (isCommand and chat.contains(command)) return@runAsync }
-            if (!isCommand && !isProxyCommand) { ConsoleLogger.logger(1, "$prefix [Chat] [$server] $displayName : $chat") }
-            if (isProxyCommand) {ConsoleLogger.logger(1, "$prefix [ProxyCommand] [$server] $displayName : $chat"); return@runAsync}
-            if (isCommand) {ConsoleLogger.logger(1, "$prefix [Command] [$server] $displayName : $chat")}
-        }
-    }
-
-    @EventHandler
-    fun switchServer(event: ServerSwitchEvent) {
-        proxy.scheduler.runAsync(plugin) {
-            if (event.from == null) return@runAsync // 当玩家是直接连接到此服务器的时候
-            val from = event.from.name
-            val target = event.player.server.info.name
-            val player = event.player.name
-            val displayName = getDisplayName(proxy.getPlayer(player).uniqueId)
-            ConsoleLogger.logger(1, "$prefix [Server] $displayName $from -> $target")
         }
     }
 
@@ -142,18 +101,6 @@ class EventLogger(private val plugin: Plugin) : Listener{
             val displayName = getDisplayName(player.uniqueId)
             ConsoleLogger.logger(1, "$prefix [Server] $displayName 已与BungeeCord断开连接.")
         } catch (_: NullPointerException) { }
-    }
-
-    @EventHandler
-    fun reload(event: ProxyReloadEvent) {
-        if (event.sender is ProxiedPlayer) {
-            event.sender.name
-            val displayName = getDisplayName((event.sender as ProxiedPlayer).uniqueId)
-            MessageUtil.logWarn("$displayName 尝试重新加载BungeeCord.")
-        }
-        MessageUtil.logWarn("不支持的操作. 请重启BungeeCord来完成重新加载的任务.")
-        MessageUtil.logWarn("如果这不是您本人所为 建议将该命令列入黑名单!")
-        ProxyServer.getInstance().stop()
     }
 }
 
