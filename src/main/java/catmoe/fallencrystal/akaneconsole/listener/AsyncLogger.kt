@@ -41,7 +41,7 @@ class AsyncLogger : EventListener {
         val cancelled = if (event.isCancelled) " &c[已取消事件]" else ""
         if (event.isProxyCommand) { ConsoleLogger.logger(1, "$prefix [ProxyCommand] [$server ${getDisplayName(player)} &7: &f$message") }
         if (event.isBackendCommand) { ConsoleLogger.logger(1, "$prefix [BackendCommand] [$server] ${getDisplayName(player)} &7: &f$message") }
-        if (!event.isProxyCommand && !event.isBackendCommand) { ConsoleLogger.logger(1, "$prefix [Chat] [$server]  ${getDisplayName(player)} &7: &f$message $cancelled") }
+        if (!event.isProxyCommand && !event.isBackendCommand) { ConsoleLogger.logger(1, "$prefix [Chat] [$server] ${getDisplayName(player)} &7: &f$message $cancelled") }
     }
 
     @FilterEvent
