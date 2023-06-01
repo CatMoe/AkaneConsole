@@ -6,7 +6,10 @@ import catmoe.fallencrystal.akaneconsole.util.ConsoleLogger
 import catmoe.fallencrystal.akaneconsole.util.Version
 import catmoe.fallencrystal.moefilter.api.user.displaycache.DisplayCache
 import net.md_5.bungee.api.ProxyServer
-import net.md_5.bungee.api.event.*
+import net.md_5.bungee.api.event.PlayerDisconnectEvent
+import net.md_5.bungee.api.event.ProxyPingEvent
+import net.md_5.bungee.api.event.ServerDisconnectEvent
+import net.md_5.bungee.api.event.ServerKickEvent
 import net.md_5.bungee.api.plugin.Listener
 import net.md_5.bungee.api.plugin.Plugin
 import net.md_5.bungee.event.EventHandler
@@ -16,20 +19,7 @@ import java.util.*
 
 class EventLogger(private val plugin: Plugin) : Listener{
 
-    private fun socketToAddress(address: SocketAddress): String { return (address as InetSocketAddress).toString() }
-
-    private val dontLoggerCommand: List<String> = listOf(
-        "/login",
-        "/l",
-        "/reg",
-        "/register",
-        "/unregister",
-        "/premium",
-        "/cracked",
-        "/createpassword",
-        "/changepassword",
-        "/startsession"
-    )
+    private fun socketToAddress(address: SocketAddress): String { return (address as InetSocketAddress).toString().replace("/", "") }
 
     private val proxy: ProxyServer = ProxyServer.getInstance()
 
@@ -80,16 +70,6 @@ class EventLogger(private val plugin: Plugin) : Listener{
                 val displayName = getDisplayName(player.uniqueId)
                 ConsoleLogger.logger(1, "$prefix [Server] $displayName 主动与服务器 $target 断开了连接.")
             } catch (_: NullPointerException) {}
-        }
-    }
-
-    @EventHandler (priority = -127)
-    fun serverConnected(event: ServerConnectedEvent) {
-        proxy.scheduler.runAsync(plugin) {
-            val player = event.player
-            val target = event.server.info.name
-            val displayName = getDisplayName(player.uniqueId)
-            ConsoleLogger.logger(1, "$prefix [Server] $displayName 已与服务器 $target 建立连接.")
         }
     }
 

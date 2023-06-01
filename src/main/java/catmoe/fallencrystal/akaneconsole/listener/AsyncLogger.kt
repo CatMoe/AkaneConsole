@@ -33,12 +33,26 @@ class AsyncLogger : EventListener {
         ConsoleLogger.logger(1, "$prefix [PostLogin] [$ipAddress] ${getDisplayName(player)} 从 $from 登录到了服务器. (版本 $version)")
     }
 
+    private val cancelLoggerCommand: List<String> = listOf(
+        "/login",
+        "/l",
+        "/reg",
+        "/register",
+        "/unregister",
+        "/premium",
+        "/cracked",
+        "/createpassword",
+        "/changepassword",
+        "/startsession"
+    )
+
     @FilterEvent
     fun onChat(event: AsyncChatEvent) {
         val player = event.sender
         val message = event.message
         val server = player.server.info.name
         val cancelled = if (event.isCancelled) " &c[已取消事件]" else ""
+        cancelLoggerCommand.forEach { if (message.startsWith(it)) { return } }
         if (event.isProxyCommand) { ConsoleLogger.logger(1, "$prefix [ProxyCommand] [$server ${getDisplayName(player)} &7: &f$message") }
         if (event.isBackendCommand) { ConsoleLogger.logger(1, "$prefix [BackendCommand] [$server] ${getDisplayName(player)} &7: &f$message") }
         if (!event.isProxyCommand && !event.isBackendCommand) { ConsoleLogger.logger(1, "$prefix [Chat] [$server] ${getDisplayName(player)} &7: &f$message $cancelled") }
