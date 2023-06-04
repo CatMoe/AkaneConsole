@@ -17,7 +17,7 @@ class AkaneConsole : Plugin() {
         MessageUtil.logInfo("$prefix 已成功载入")
         LoggerManager.registerFilter(OriginalFilter())
         MessageUtil.logInfo("$prefix 已成功与MoeFilter挂钩并注册控制台过滤器.")
-        EventManager.registerListener(AsyncLogger())
+        EventManager.registerListener(this, AsyncLogger())
         MessageUtil.logInfo("$prefix 正在使用 MoeFilter异步事件.")
     }
 
