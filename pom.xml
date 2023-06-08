@@ -6,7 +6,7 @@
 
   <groupId>catmoe.fallencrystal.akaneconsole</groupId>
   <artifactId>AkaneConsole</artifactId>
-  <version>1.6-Hotfix1</version>
+  <version>1.7</version>
   <packaging>jar</packaging>
 
   <name>AkaneConsole</name>
