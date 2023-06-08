@@ -6,6 +6,7 @@ object Version  {
 
     private fun protocolToName(version: Int): String {
         return when (version) {
+            763 -> { "1.20" }
             762 -> { "1.19.4" }
             761 -> { "1.19.3" }
             760 -> { "1.19.1/2" }
