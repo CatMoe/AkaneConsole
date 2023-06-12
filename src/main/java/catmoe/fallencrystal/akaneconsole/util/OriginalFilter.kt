@@ -19,7 +19,7 @@ class OriginalFilter : ILogger {
         "Plugin listener catmoe.fallencrystal."
     )
 
-    override fun isLoggable(record: LogRecord?): Boolean { if (record != null) { return !needFilter(record.message) }; return true }
+    override fun isLoggable(record: LogRecord?, isCancelled: Boolean): Boolean { if (record != null) { return !needFilter(record.message) }; return true }
 
     private fun needFilter(record: String): Boolean {
         if (record.contains("[AkaneConsole]")) return false
