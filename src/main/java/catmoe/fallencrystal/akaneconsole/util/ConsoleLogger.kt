@@ -1,6 +1,6 @@
 package catmoe.fallencrystal.akaneconsole.util
 
-import catmoe.fallencrystal.moefilter.util.message.MessageUtil
+import catmoe.fallencrystal.moefilter.util.message.v2.MessageUtil
 import com.github.benmanes.caffeine.cache.Caffeine
 import java.util.concurrent.TimeUnit
 
@@ -26,7 +26,7 @@ object ConsoleLogger {
         val messageCount = getMessageCount(message)
         writeMessage(message)
         if (messageCount == spamLimit) { m.logWarn("检测到指定消息的垃圾邮件 将阻止发送. ($expireTime 秒内允许发送 $spamLimit 条消息)")}
-        if (messageCount >= spamLimit) return
+        if (messageCount >= spamLimit) { writeMessage(message); return }
         if (mode == 1) { m.logInfo(message) }
         if (mode == 2) { m.logWarn(message) }
         if (mode != 1 && mode != 2) { throw Exception("Type $mode is unknown mode.") }

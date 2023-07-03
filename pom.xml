@@ -6,7 +6,7 @@
 
   <groupId>catmoe.fallencrystal.akaneconsole</groupId>
   <artifactId>AkaneConsole</artifactId>
-  <version>1.8</version>
+  <version>1.9</version>
   <packaging>jar</packaging>
 
   <name>AkaneConsole</name>
@@ -93,14 +93,13 @@
       <groupId>com.github.ben-manes.caffeine</groupId>
       <artifactId>caffeine</artifactId>
       <version>2.9.3</version>
-      <scope>compile</scope>
+      <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>catmoe.fallencrystal</groupId>
+      <groupId>catmoe.fallencrystal.moefilter</groupId>
       <artifactId>MoeFilter</artifactId>
-      <version>0.0.1-API4</version>
-      <scope>system</scope>
-      <systemPath>${project.basedir}/lib/MoeFilter.jar</systemPath>
+      <version>0.0.3</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.jetbrains.kotlin</groupId>

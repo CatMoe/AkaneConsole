@@ -8,12 +8,14 @@ import catmoe.fallencrystal.moefilter.api.event.events.bungee.AsyncChatEvent
 import catmoe.fallencrystal.moefilter.api.event.events.bungee.AsyncPostLoginEvent
 import catmoe.fallencrystal.moefilter.api.event.events.bungee.AsyncServerConnectEvent
 import catmoe.fallencrystal.moefilter.api.event.events.bungee.AsyncServerSwitchEvent
+import catmoe.fallencrystal.moefilter.api.event.events.channel.ClientBrandPostEvent
 import catmoe.fallencrystal.moefilter.api.user.displaycache.DisplayCache
 import net.md_5.bungee.api.connection.ProxiedPlayer
 import java.net.InetSocketAddress
 
 class AsyncLogger : EventListener {
     private val prefix = "[AkaneConsole]"
+
     @FilterEvent
     fun onServerConnect(event: AsyncServerConnectEvent) {
         if (event.isConnected) {
@@ -65,6 +67,13 @@ class AsyncLogger : EventListener {
         val target = event.player.server.info.name
         val displayName = getDisplayName(event.player)
         ConsoleLogger.logger(1, "$prefix [Server] $displayName $from -> $target")
+    }
+
+    @FilterEvent
+    fun onPostBrand(event: ClientBrandPostEvent) {
+        val brand = event.brand
+        val displayName = getDisplayName(event.player)
+        ConsoleLogger.logger(1, "$prefix [Client] $displayName 正在使用 $brand 客户端")
     }
 
     private fun getDisplayName(player: ProxiedPlayer): String {

@@ -1,7 +1,6 @@
 package catmoe.fallencrystal.akaneconsole.util
 
 object Version  {
-    @JvmStatic
     fun getVersion(ver: Int): String{return protocolToName(ver)}
 
     private fun protocolToName(version: Int): String {
