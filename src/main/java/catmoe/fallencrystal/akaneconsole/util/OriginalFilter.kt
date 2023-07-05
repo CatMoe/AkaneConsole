@@ -1,7 +1,8 @@
 package catmoe.fallencrystal.akaneconsole.util
 
+import catmoe.fallencrystal.akaneconsole.config.Config
+import catmoe.fallencrystal.akaneconsole.logger.LogType
 import catmoe.fallencrystal.moefilter.api.logger.ILogger
-import catmoe.fallencrystal.moefilter.util.message.MessageUtil
 import java.util.logging.LogRecord
 
 class OriginalFilter : ILogger {
@@ -14,7 +15,9 @@ class OriginalFilter : ILogger {
         "[{0}] disconnected with: {1}",
         "{0} executed command: /{1}",
         "Error occurred processing connection for",
-        "Error authenticating",
+        "Error authenticating ",
+        "with Minecraft.net",
+        "Cloud verify username",
         "has been reloaded. This is NOT advisable and you will not be supported with any issues that arise! Please restart",
         "Plugin listener catmoe.fallencrystal."
     )
@@ -23,15 +26,15 @@ class OriginalFilter : ILogger {
 
     private fun needFilter(record: String): Boolean {
         if (record.contains("[AkaneConsole]")) return false
-        exceptionCatcher(record)
+        mojangCatcher(record)
         for (filtered in original) {if(record.contains(filtered)) return true}
         return false
     }
 
-    private fun exceptionCatcher(log: String) {
-        val unreachableMojangSessionServer1 = "Error authenticating"
-        val unreachableMojangSessionServer2 = "with minecraft.net"
-        if (log.contains(unreachableMojangSessionServer1) && log.contains(unreachableMojangSessionServer2))
-        {MessageUtil.logWarn("[AkaneConsole] 无法连接到认证服务器(sessionserver.mojang.com).")}
+    private fun mojangCatcher(log: String) {
+        var logable = false
+        if (log.contains("Error authenticating ") && log.contains(" with Minecraft.net")) logable=true
+        if (log.contains("Could verify username!")) logable=true
+        if (logable) { ConsoleLogger.logger(1, Config.instance.message[LogType.FAILED_VERIFY]!!) }
     }
 }

@@ -11,6 +11,7 @@
       <configuration>
         <autoDetectTypes>
           <platformType>BUNGEECORD</platformType>
+          <platformType>ADVENTURE</platformType>
         </autoDetectTypes>
       </configuration>
     </facet>

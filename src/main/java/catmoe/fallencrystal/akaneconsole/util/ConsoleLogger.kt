@@ -22,6 +22,7 @@ object ConsoleLogger {
 
     fun logger(mode: Int, message: String) {
         val m = MessageUtil
+        if (message.contains("§")) throw RuntimeException(message)
         val spamLimit = 3
         val messageCount = getMessageCount(message)
         writeMessage(message)
@@ -29,7 +30,7 @@ object ConsoleLogger {
         if (messageCount >= spamLimit) { writeMessage(message); return }
         if (mode == 1) { m.logInfo(message) }
         if (mode == 2) { m.logWarn(message) }
-        if (mode != 1 && mode != 2) { throw Exception("Type $mode is unknown mode.") }
+        if (mode != 1 && mode != 2) { throw IllegalArgumentException("Type $mode is unknown mode.") }
     }
 
 }
