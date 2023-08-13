@@ -43,11 +43,11 @@ object Listener : EventListener, Listener {
         var msg = message
         val connection = ConnectionUtil(player.pendingConnection)
         val map = mapOf(
-            "%version%" to Version.getVersion(connection.getVersion()),
+            "%version%" to Version.getVersion(connection.version),
             "%host%" to connection.connection.virtualHost.hostString,
             "%name%" to player.name,
             "%displayname%" to getDisplayName(player),
-            "%address%" to connection.inetAddress().toString().replace("/", ""),
+            "%address%" to connection.inetAddress.address.toString(),
             "%server%" to try { player.server.info.name } catch (_: NullPointerException) { "" }
         )
         map.forEach { (placeholder, target) -> msg=msg.replace(placeholder, target) }
@@ -128,7 +128,7 @@ object Listener : EventListener, Listener {
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
-    @Suppress("deprecation")
+    @Suppress("DEPRECATION")
     fun whenKickBecauseBackend(event: ServerKickEvent) {
         scheduler.runAsync {
             try {

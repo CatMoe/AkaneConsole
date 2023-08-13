@@ -41,7 +41,7 @@ class Config(private val file: File) {
                     proxy-command="%prefix%[ProxyCommand] %displayname%<gray> : %message%"
                     backend-command="%prefix%[BackendCommand] %displayname%<gray> : %message%"
                     cancelled="<red>[已取消事件]"
-                    ignore-command=[
+                    ignore-commands=[
                         "login",
                         "l",
                         "register",
