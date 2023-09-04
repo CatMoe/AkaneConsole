@@ -1,11 +1,11 @@
 package catmoe.fallencrystal.akaneconsole.config
 
 import catmoe.fallencrystal.akaneconsole.logger.LogType
-import catmoe.fallencrystal.moefilter.common.config.util.CreateConfig
+import catmoe.fallencrystal.translation.utils.config.CreateConfig
 
 import java.io.File
 
-class Config(private val file: File) {
+class Config(file: File) {
 
     private val default = """
                 # 可自定义占位符. 您可以创建无限行 并且支持MiniMessage
@@ -119,15 +119,6 @@ class Config(private val file: File) {
             result[it]=message
         }
         return result
-    }
-
-    fun reload() {
-        val newUtil = CreateConfig(file)
-        newUtil.setDefaultConfig(default)
-        newUtil.onLoad()
-        config=newUtil.getConfig()!!
-        placeholder=loadPlaceholder()
-        message=loadMessage()
     }
 
     companion object {

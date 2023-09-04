@@ -7,8 +7,8 @@ import java.util.concurrent.TimeUnit
 object ConsoleLogger {
     data class CacheEntry(val message: String, var count: Int = 1)
 
-    private const val expireTime = 5
-    private val messageCache = Caffeine.newBuilder().expireAfterWrite(expireTime.toLong(), TimeUnit.SECONDS).build<String, CacheEntry>()
+    private const val EXPIRE_TIME = 5
+    private val messageCache = Caffeine.newBuilder().expireAfterWrite(EXPIRE_TIME.toLong(), TimeUnit.SECONDS).build<String, CacheEntry>()
 
     private fun writeMessage(message: String) {
         val entry = messageCache.getIfPresent(message)
@@ -21,12 +21,13 @@ object ConsoleLogger {
     }
 
     fun logger(mode: Int, message: String) {
+        if (message.isEmpty()) return
         val m = MessageUtil
         if (message.contains("§")) throw RuntimeException(message)
         val spamLimit = 3
         val messageCount = getMessageCount(message)
         writeMessage(message)
-        if (messageCount == spamLimit) { m.logWarn("检测到指定消息的垃圾邮件 将阻止发送. ($expireTime 秒内允许发送 $spamLimit 条消息)")}
+        if (messageCount == spamLimit) { m.logWarn("检测到指定消息的垃圾邮件 将阻止发送. ($EXPIRE_TIME 秒内允许发送 $spamLimit 条消息)")}
         if (messageCount >= spamLimit) { writeMessage(message); return }
         if (mode == 1) { m.logInfo(message) }
         if (mode == 2) { m.logWarn(message) }
