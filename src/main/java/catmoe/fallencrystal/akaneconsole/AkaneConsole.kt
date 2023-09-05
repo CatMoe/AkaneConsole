@@ -27,7 +27,7 @@ class AkaneConsole : Plugin() {
         MessageUtil.logInfo("$prefix 已成功载入")
         LoggerManager.registerFilter(OriginalFilter())
         MessageUtil.logInfo("$prefix 已成功与MoeFilter挂钩并注册控制台过滤器.")
-        EventManager.register(Listener)
+        EventManager.register(TranslationListener())
         pm.registerListener(this, Listener)
         MessageUtil.logInfo("$prefix 正在使用 MoeFilter 异步事件.")
     }
@@ -35,7 +35,7 @@ class AkaneConsole : Plugin() {
     override fun onDisable() {
         MessageUtil.logWarn("$prefix 卸载中..")
         LoggerManager.unregisterFilter(filter)
-        EventManager.unregister(Listener)
+        EventManager.unregister(TranslationListener())
         pm.unregisterListener(Listener)
         MessageUtil.logInfo("$prefix 监听器已卸载完成.")
     }

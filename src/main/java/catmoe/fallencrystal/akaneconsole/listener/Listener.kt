@@ -9,7 +9,6 @@ import catmoe.fallencrystal.moefilter.api.user.displaycache.DisplayCache
 import catmoe.fallencrystal.moefilter.network.bungee.util.bconnection.ConnectionUtil
 import catmoe.fallencrystal.moefilter.util.message.v2.MessageUtil
 import catmoe.fallencrystal.moefilter.util.plugin.util.Scheduler
-import catmoe.fallencrystal.translation.event.EventListener
 import catmoe.fallencrystal.translation.event.events.player.*
 import catmoe.fallencrystal.translation.player.TranslatePlayer
 import catmoe.fallencrystal.translation.player.bungee.BungeePlayer
@@ -27,14 +26,14 @@ import net.md_5.bungee.event.EventHandler
 import net.md_5.bungee.event.EventPriority
 import java.net.InetSocketAddress
 
-object Listener : EventListener, Listener {
+object Listener : Listener {
 
     private val loggedBrand = Caffeine.newBuilder().build<ProxiedPlayer, Boolean>()
 
     private val messages = Config.instance.message
     private val scheduler = Scheduler(AkaneConsole.instance)
 
-    fun basicPlaceholder(message: String, player: ProxiedPlayer): String {
+    private fun basicPlaceholder(message: String, player: ProxiedPlayer): String {
         var msg = message
         val connection = ConnectionUtil(player.pendingConnection)
         val map = mapOf(
