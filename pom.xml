@@ -92,7 +92,7 @@
     <dependency>
       <groupId>catmoe.fallencrystal.moefilter</groupId>
       <artifactId>MoeFilter-Bungee</artifactId>
-      <version>0.1.2</version>
+      <version>0.1.4</version>
       <scope>provided</scope>
     </dependency>
     <dependency>

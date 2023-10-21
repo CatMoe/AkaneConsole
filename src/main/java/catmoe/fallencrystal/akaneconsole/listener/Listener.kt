@@ -96,7 +96,7 @@ object Listener : Listener {
         val player = (event.player.upstream as BungeePlayer).player
         val message = basicPlaceholder(messages[LogType.SWITCH_SERVER]!!, player)
             .replace("%from%", event.from.getName())
-            .replace("%target%", event.player.getName())
+            .replace("%target%", event.to.getName())
         ConsoleLogger.logger(1, message)
     }
 

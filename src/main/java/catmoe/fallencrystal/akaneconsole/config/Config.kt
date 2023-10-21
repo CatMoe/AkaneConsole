@@ -90,6 +90,8 @@ class Config(file: File) {
                 108="1.9.1"
                 107="1.9"
                 47="1.8.x"
+                5="1.7.x"
+                4="1.7.x"
                 unknown="Unknown (%version%)"
             }
     """.trimIndent()
@@ -113,7 +115,7 @@ class Config(file: File) {
     private fun loadMessage(): Map<LogType, String> {
         val config = config.getConfig("messages")
         val result = mutableMapOf<LogType, String>()
-        for (it in LogType.values()) {
+        for (it in LogType.entries) {
             var message = config.getString(it.path)
             placeholder.forEach { (placeholder, m) -> message=message.replace(placeholder, m) }
             result[it]=message
